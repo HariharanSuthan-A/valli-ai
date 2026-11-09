@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: valli-govt-call-agent
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.3
+      - key: GNANI_API_KEY
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GROQ_MODEL
+        value: openai/gpt-oss-20b
+      - key: GROQ_BASE_URL
+        value: https://api.groq.com/openai/v1
+      - key: EVON_BASE_URL
+        value: http://localhost:8001/v1
+      - key: EVON_MODEL
+        value: gnani/gnani-evon-v3.3-30B-A3B
+      - key: EVON_API_KEY
+        value: not-needed-for-local
+      - key: MOCK
+        value: "0"
+      - key: SILENCE_WARN_S
+        value: "45.0"
+      - key: SILENCE_END_S
+        value: "30.0"
+

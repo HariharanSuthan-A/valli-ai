@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Valli – அரசு சேவைகள்</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Idle / pre-call screen -->
+    <div id="screen-idle" class="screen active">
+      <div class="logo-area">
+        <div class="logo-icon">📞</div>
+        <h1 class="app-title">Valli (வள்ளி)</h1>
+        <p class="app-subtitle">அரசு சேவை உதவி மையம்</p>
+      </div>
+      <div class="headphone-hint">🎧 Headphones recommended for the best experience</div>
+      <button id="btn-call" class="btn-call-start" onclick="startCall()">
+        <span class="call-icon">📲</span>
+        <span>Call Now</span>
+      </button>
+      <p id="mic-error" class="mic-error hidden"></p>
+    </div>
+
+    <!-- Active call screen -->
+    <div id="screen-call" class="screen hidden">
+      <!-- Status bar -->
+      <div class="call-header">
+        <div class="contact-info">
+          <div class="contact-avatar">🤖</div>
+          <div>
+            <div class="contact-name">Valli (வள்ளி)</div>
+            <div class="call-status" id="call-status">Connecting…</div>
+          </div>
+        </div>
+        <div class="call-timer" id="call-timer">0:00</div>
+      </div>
+
+      <!-- Live captions -->
+      <div class="captions-area" id="captions-area">
+        <div class="caption-row hidden" id="user-caption">
+          <span class="caption-label">You:</span>
+          <span id="user-caption-text"></span>
+        </div>
+        <div class="caption-row" id="agent-caption">
+          <span class="caption-label">Valli:</span>
+          <span id="agent-caption-text">…</span>
+        </div>
+      </div>
+
+      <!-- Service card (shown when a service is matched) -->
+      <div class="service-card hidden" id="service-card">
+        <div class="service-card-header">
+          <span class="service-icon">📋</span>
+          <span id="service-name-en"></span>
+          <span class="service-name-ta" id="service-name-ta"></span>
+        </div>
+        <div class="documents-section" id="documents-section">
+          <div class="docs-label">Documents needed:</div>
+          <ul id="docs-list"></ul>
+        </div>
+        <a id="service-site-btn" class="service-site-btn" target="_blank" rel="noopener noreferrer">
+          🌐 Official Website
+        </a>
+      </div>
+
+      <!-- Call controls -->
+      <div class="call-controls">
+        <button id="btn-mute" class="ctrl-btn mute-btn" onclick="toggleMute()">
+          <span id="mute-icon">🎙️</span>
+          <span>Mute</span>
+        </button>
+        <button id="btn-captions" class="ctrl-btn caption-btn" onclick="toggleCaptions()">
+          <span>CC</span>
+          <span>Captions</span>
+        </button>
+        <button id="btn-end" class="ctrl-btn end-btn" onclick="endCall()">
+          <span>📵</span>
+          <span>End</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Call ended screen -->
+    <div id="screen-ended" class="screen hidden">
+      <div class="ended-icon">📵</div>
+      <h2>Call Ended</h2>
+      <p>Nandri! Thank you for calling Valli.</p>
+      <button class="btn-call-start" onclick="resetUI()">Call Again</button>
+    </div>
+  </div>
+
+  <audio id="ring-audio" src="/audio/ring.mp3" loop></audio>
+
+  <script src="/call.js"></script>
+</body>
+</html>
+

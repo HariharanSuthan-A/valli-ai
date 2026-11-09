@@ -1,0 +1,253 @@
+[
+  {
+    "id": "passport",
+    "name_en": "Passport Application",
+    "name_ta": "",
+    "what_it_is": "Indian passport issued by the Ministry of External Affairs. Required for international travel.",
+    "who_can_apply": "Any Indian citizen. Minor passports require a parent or guardian to apply.",
+    "documents": [
+      "Proof of address (Aadhaar card, voter ID, utility bill)",
+      "Proof of date of birth (birth certificate, school leaving certificate)",
+      "Photo identity proof (Aadhaar, PAN card, voter ID)",
+      "Recent passport-size photographs",
+      "Existing passport (if renewal)"
+    ],
+    "where_to_apply": "Online at passportindia.gov.in. Visit the nearest Passport Seva Kendra (PSK) or Post Office Passport Seva Kendra (POPSK) for the appointment.",
+    "steps": [
+      "Register at passportindia.gov.in and log in",
+      "Fill the online application form (Form 1)",
+      "Pay the application fee online",
+      "Book an appointment at the nearest PSK or POPSK",
+      "Visit the PSK with original documents on the appointment date",
+      "Police verification is conducted",
+      "Passport is dispatched by Speed Post"
+    ],
+    "official_site": "https://passportindia.gov.in",
+    "last_checked": "2026-10-01",
+    "verified": false
+  },
+  {
+    "id": "driving_licence",
+    "name_en": "Driving Licence",
+    "name_ta": "டிரைவிங் லைசென்ஸ்",
+    "what_it_is": "Official document authorising a person to drive a motor vehicle on Indian roads.",
+    "who_can_apply": "Indian residents aged 16+ for gearless two-wheelers; 18+ for other vehicles. Must hold a valid Learner's Licence first.",
+    "documents": [
+      "Learner's Licence (LL)",
+      "Proof of age (birth certificate, Aadhaar, school certificate)",
+      "Proof of address (Aadhaar, voter ID, utility bill)",
+      "Medical certificate (Form 1A for transport vehicles)",
+      "Recent passport-size photographs"
+    ],
+    "where_to_apply": "Online at parivahan.gov.in or visit the nearest Regional Transport Office (RTO).",
+    "steps": [
+      "Apply online at parivahan.gov.in or visit the RTO",
+      "First obtain a Learner's Licence by passing the online theory test",
+      "Wait at least 30 days after getting the Learner's Licence",
+      "Book a driving test slot online or at the RTO",
+      "Pass the driving skill test at the RTO",
+      "Licence is printed and delivered by post"
+    ],
+    "official_site": "https://parivahan.gov.in",
+    "last_checked": "2026-10-01",
+    "verified": false
+  },
+  {
+    "id": "aadhaar_update",
+    "name_en": "Aadhaar Update",
+    "name_ta": "ஆதார் அப்டேட்",
+    "what_it_is": "Service to update personal details (name, address, date of birth, mobile number, photo) in the Aadhaar database maintained by UIDAI.",
+    "who_can_apply": "Any Aadhaar card holder who needs to correct or update their details.",
+    "documents": [
+      "Valid identity proof (for name change): PAN card, voter ID, passport",
+      "Valid address proof (for address update): utility bill, bank passbook, rental agreement",
+      "Date of birth proof (for DOB update): birth certificate, school certificate",
+      "Mobile number required for OTP during online updates"
+    ],
+    "where_to_apply": "Online at myaadhaar.uidai.gov.in. For biometric updates, visit the nearest Aadhaar Enrolment or Update Centre.",
+    "steps": [
+      "Visit myaadhaar.uidai.gov.in and log in with your Aadhaar number and OTP",
+      "Select 'Update Aadhaar' and choose the field to update",
+      "Upload supporting documents",
+      "Submit the request and note the Update Request Number (URN)",
+      "Track status at myaadhaar.uidai.gov.in using the URN",
+      "Updated Aadhaar will be available for download within 90 days"
+    ],
+    "official_site": "https://uidai.gov.in",
+    "last_checked": "2026-10-01",
+    "verified": false
+  },
+  {
+    "id": "pan_card",
+    "name_en": "PAN Card",
+    "name_ta": "பான் கார்டு",
+    "what_it_is": "Permanent Account Number (PAN) card issued by the Income Tax Department of India. Required for financial transactions and filing income tax returns.",
+    "who_can_apply": "Any Indian citizen or entity (individual, company, trust) that is a taxpayer or conducts financial transactions.",
+    "documents": [
+      "Proof of identity (Aadhaar card, voter ID, passport, driving licence)",
+      "Proof of address (Aadhaar card, voter ID, passport, utility bill)",
+      "Proof of date of birth (birth certificate, Aadhaar, matriculation certificate)",
+      "Recent passport-size photograph"
+    ],
+    "where_to_apply": "Online at incometax.gov.in (through NSDL or UTIITSL portals). Can also be applied via authorised PAN centres.",
+    "steps": [
+      "Visit incometax.gov.in or apply through NSDL/UTIITSL portal",
+      "Fill Form 49A (for Indian citizens)",
+      "Upload supporting documents and photograph",
+      "Submit the application and pay the processing fee",
+      "Receive acknowledgement number to track status",
+      "PAN card is dispatched by post within 15 working days"
+    ],
+    "official_site": "https://incometax.gov.in",
+    "last_checked": "2026-10-01",
+    "verified": false
+  },
+  {
+    "id": "voter_id",
+    "name_en": "Voter ID (EPIC)",
+    "name_ta": "வோட்டர் ஐடி",
+    "what_it_is": "Electoral Photo Identity Card (EPIC) issued by the Election Commission of India. Used for exercising the right to vote and as a photo identity proof.",
+    "who_can_apply": "Indian citizens who are 18 years of age or older as on the qualifying date (usually January 1 of the year of enrollment).",
+    "documents": [
+      "Proof of age (birth certificate, Aadhaar, school certificate)",
+      "Proof of address (Aadhaar, utility bill, bank passbook, rent agreement)",
+      "Recent passport-size photograph"
+    ],
+    "where_to_apply": "Online at voters.eci.gov.in. Can also register through the Electoral Registration Officer (ERO) at the local tehsil or municipality office.",
+    "steps": [
+      "Visit voters.eci.gov.in and click on 'New Voter Registration'",
+      "Fill Form 6 with personal details and address",
+      "Upload required documents and photograph",
+      "Submit the application; note the reference ID",
+      "Booth Level Officer (BLO) may visit to verify details",
+      "Voter ID card is printed and dispatched"
+    ],
+    "official_site": "https://eci.gov.in",
+    "last_checked": "2026-10-01",
+    "verified": false
+  },
+  {
+    "id": "ration_card_tn",
+    "name_en": "Ration Card (Tamil Nadu)",
+    "name_ta": "ரேஷன் கார்டு",
+    "what_it_is": "Tamil Nadu Public Distribution System (TNPDS) ration card that entitles eligible families to subsidised food grains and other commodities.",
+    "who_can_apply": "Residents of Tamil Nadu. Eligibility depends on the category: PHH (Priority Household), NPHH (Non-Priority), or AAY (Antyodaya Anna Yojana).",
+    "documents": [
+      "Identity proof of the head of family (Aadhaar card)",
+      "Aadhaar cards of all family members to be included",
+      "Proof of residence in Tamil Nadu (electricity bill, rental agreement)",
+      "Recent passport-size photograph of the head of family"
+    ],
+    "where_to_apply": "Online at tnpds.gov.in. Alternatively, visit the nearest Taluk or District Supply Office.",
+    "steps": [
+      "Visit tnpds.gov.in and register with your mobile number",
+      "Log in and select 'Apply for New Smart Card'",
+      "Fill in family details and upload Aadhaar for all members",
+      "Submit the application and note the reference number",
+      "Inspector may visit to verify the details",
+      "Smart ration card is linked to your Aadhaar and delivered"
+    ],
+    "official_site": "https://tnpds.gov.in",
+    "last_checked": "2026-10-01",
+    "verified": false
+  },
+  {
+    "id": "tn_pension_scheme",
+    "name_en": "Tamil Nadu Social Security Pension (TNSSP)",
+    "name_ta": "தமிழ்நாடு பென்ஷன் ஸ்கீம்",
+    "what_it_is": "Monthly pension for elderly, widows, deserted women and differently abled persons in Tamil Nadu under the Social Security and Women's Welfare Department.",
+    "who_can_apply": "Tamil Nadu residents who are: (a) aged 60+ years without other income support, (b) widows aged 40+, (c) differently abled persons, (d) deserted women. Income criteria apply; check the official site for current limits.",
+    "documents": [
+      "Aadhaar card",
+      "Age proof (birth certificate, Aadhaar, school records)",
+      "Proof of residence in Tamil Nadu",
+      "Bank account details (passbook copy) linked to Aadhaar",
+      "Death certificate of spouse (for widow pension)",
+      "Disability certificate from a government hospital (for differently abled pension)"
+    ],
+    "where_to_apply": "Apply at the nearest Village Administrative Officer (VAO) office, Taluk office, or through the Tamil Nadu e-Sevai centres.",
+    "steps": [
+      "Collect the application form from the VAO or Taluk office, or download from the official site",
+      "Fill in personal details and attach supporting documents",
+      "Submit the application to the VAO or Taluk office",
+      "The application is verified by the Tahsildar",
+      "If approved, pension is credited monthly to the Aadhaar-linked bank account"
+    ],
+    "official_site": "https://socialsecurity.tn.gov.in",
+    "last_checked": "2026-10-01",
+    "verified": false
+  },
+  {
+    "id": "pm_kisan",
+    "name_en": "PM-KISAN (Pradhan Mantri Kisan Samman Nidhi)",
+    "name_ta": "பிரதம மந்திரி கிசான் சம்மான் நிதி",
+    "what_it_is": "Central government income-support scheme providing direct income support to small and marginal farmer families across India.",
+    "who_can_apply": "Small and marginal farmer families who own cultivable land. Certain categories are excluded (income tax payers, constitutional post holders, professionals with higher income). Check the official site for the full exclusion list.",
+    "documents": [
+      "Aadhaar card",
+      "Land ownership records (patta / chitta) showing cultivable land holding",
+      "Bank account details (passbook copy) linked to Aadhaar",
+      "Mobile number for registration"
+    ],
+    "where_to_apply": "Register online at pmkisan.gov.in or through the nearest Common Service Centre (CSC) or Patwari/Village Revenue Officer.",
+    "steps": [
+      "Visit pmkisan.gov.in and click 'Farmers Corner' → 'New Farmer Registration'",
+      "Enter Aadhaar number, mobile number and state",
+      "Fill in personal and land details",
+      "Submit; a verification SMS is sent to the registered mobile",
+      "After state/district-level verification, benefits are transferred directly to the bank account in three instalments per year"
+    ],
+    "official_site": "https://pmkisan.gov.in",
+    "last_checked": "2026-10-01",
+    "verified": false
+  },
+  {
+    "id": "pmjay_ayushman",
+    "name_en": "Ayushman Bharat – PM-JAY",
+    "name_ta": "ஆயுஷ்மான் பாரத்",
+    "what_it_is": "World's largest government-funded health insurance scheme providing cashless hospitalisation coverage per family per year at empanelled public and private hospitals.",
+    "who_can_apply": "Families listed in the Socio-Economic Caste Census (SECC) 2011 database. In Tamil Nadu, also covers beneficiaries under the Chief Minister's Comprehensive Health Insurance Scheme (CMCHIS). Eligibility can be checked online.",
+    "documents": [
+      "Aadhaar card of the applicant",
+      "Ration card or any identity document of the family",
+      "Mobile number"
+    ],
+    "where_to_apply": "Check eligibility at pmjay.gov.in. If eligible, get the Ayushman card at nearest Common Service Centre (CSC), empanelled hospital, or via the ABHA (Ayushman Bharat Health Account) app.",
+    "steps": [
+      "Check eligibility at pmjay.gov.in using Aadhaar or ration card number",
+      "If eligible, visit the nearest empanelled hospital or CSC with Aadhaar",
+      "Get the Ayushman Card issued (e-card or printed)",
+      "During hospitalisation, show the Ayushman Card at the hospital's Ayushman Mitra desk for cashless treatment"
+    ],
+    "official_site": "https://pmjay.gov.in",
+    "last_checked": "2026-10-01",
+    "verified": false
+  },
+  {
+    "id": "nsp_scholarship",
+    "name_en": "National Scholarship Portal (NSP) Scholarships",
+    "name_ta": "நேஷனல் ஸ்காலர்ஷிப் போர்டல் ஸ்காலர்ஷிப்ஸ்",
+    "what_it_is": "Single-window platform for students to apply for central government scholarships including pre-matric, post-matric, merit-cum-means, and scholarships for minority communities.",
+    "who_can_apply": "Students enrolled in recognised schools, colleges or technical institutions. Each scholarship scheme has its own eligibility criteria including income limits and academic performance. Check NSP for the specific scheme.",
+    "documents": [
+      "Aadhaar card of the student",
+      "Current year admission proof (bonafide certificate or fee receipt)",
+      "Previous year marksheet / certificate",
+      "Bank account passbook copy in the student's name linked to Aadhaar",
+      "Income certificate from a competent authority",
+      "Caste/community certificate (if applicable)"
+    ],
+    "where_to_apply": "Online at scholarships.gov.in. Applications are open during the announced window each academic year.",
+    "steps": [
+      "Visit scholarships.gov.in and register as a new student",
+      "Log in and select the applicable scholarship scheme",
+      "Fill the application form and upload required documents",
+      "Submit the application before the deadline",
+      "Application is verified by the institution and then by the state/district nodal officer",
+      "Scholarship amount is credited directly to the student's bank account"
+    ],
+    "official_site": "https://scholarships.gov.in",
+    "last_checked": "2026-10-01",
+    "verified": false
+  }
+]
