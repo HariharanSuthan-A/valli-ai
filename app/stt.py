@@ -66,7 +66,14 @@ async def _mock_stream(pcm_queue: asyncio.Queue) -> AsyncIterator[STTEvent]:
 # ── Real streaming mode (using official SDK) ──────────────────────────────────
 
 
-async def _real_stream(pcm_queue: asyncio.Queue) -> AsyncIterator[STTEvent]:
+# Prisma streaming expects fixed-size frames: 512 PCM16 samples = 1024 bytes
+# (32 ms at 16 kHz).  Older clients send 20 ms chunks, so re-frame defensively.
+STREAM_FRAME_BYTES = 1024
+
+
+async def _real_stream(
+    pcm_queue: asyncio.Queue, language: str = STT_LANGUAGE
+) -> AsyncIterator[STTEvent]:
     """Connect to Prisma WebSocket stream using GnaniSTTStreamClient and yield events."""
     try:
         from gnani.stt import (
@@ -78,59 +85,99 @@ async def _real_stream(pcm_queue: asyncio.Queue) -> AsyncIterator[STTEvent]:
     except ImportError as exc:
         raise GnaniError("gnani-vachana package not installed") from exc
 
+    client = GnaniSTTStreamClient(
+        api_key=GNANI_API_KEY,
+        language_code=language,
+        sample_rate=16000,
+    )
     try:
-        client = GnaniSTTStreamClient(
-            api_key=GNANI_API_KEY,
-            language_code=STT_LANGUAGE,
-            sample_rate=16000,
-        )
         await client.connect()
+    except asyncio.CancelledError:
+        raise
+    except Exception as exc:
+        raise GnaniError(f"Prisma STT connect error: {exc}") from exc
 
-        async def _sender():
+    send_error: list[BaseException] = []
+
+    async def _sender() -> None:
+        """Forward mic PCM to Prisma in exact 1024-byte frames."""
+        buf = bytearray()
+        try:
             while True:
                 chunk = await pcm_queue.get()
                 if chunk is None:
                     break
-                try:
-                    await client.send_audio(chunk)
-                except Exception as exc:
-                    log.warning("STT send error: %s", exc)
-                    break
+                buf.extend(chunk)
+                while len(buf) >= STREAM_FRAME_BYTES:
+                    frame = bytes(buf[:STREAM_FRAME_BYTES])
+                    del buf[:STREAM_FRAME_BYTES]
+                    await client.send_audio(frame)
 
-        send_task = asyncio.create_task(_sender())
-
-        try:
-            async for event in client.events():
-                if isinstance(event, StreamTranscriptEvent):
-                    yield STTEvent(
-                        type="final",
-                        text=event.text,
-                        segment_id=str(getattr(event, "segment_id", event.segment_index)),
-                        latency_ms=getattr(event, "latency", None),
-                        raw=getattr(event, "raw", {}),
-                    )
-                elif isinstance(event, StreamProcessingEvent):
-                    # Interim processing event from VAD
-                    yield STTEvent(type="partial", text="")
-                elif isinstance(event, StreamErrorEvent):
-                    yield STTEvent(type="error", text=event.message)
-                    break
-        finally:
-            send_task.cancel()
+            # Flush a trailing partial frame (padded with silence) so the VAD
+            # can finalise the last utterance instead of discarding it.
+            if buf:
+                buf.extend(b"\x00" * (STREAM_FRAME_BYTES - len(buf)))
+                await client.send_audio(bytes(buf))
+        except asyncio.CancelledError:
+            raise
+        except Exception as exc:  # noqa: BLE001 - surfaced after the event loop ends
+            send_error.append(exc)
+            log.warning("STT send error: %s", exc)
             try:
-                await send_task
-            except asyncio.CancelledError:
+                await client.close()
+            except Exception:
                 pass
-            await client.close()
 
+    send_task = asyncio.create_task(_sender(), name="stt-sender")
+
+    try:
+        async for event in client.events():
+            if isinstance(event, StreamTranscriptEvent):
+                segment_id = str(
+                    getattr(event, "segment_id", "")
+                    or getattr(event, "segment_index", "")
+                )
+                yield STTEvent(
+                    type="final",
+                    text=event.text,
+                    segment_id=segment_id,
+                    latency_ms=getattr(event, "latency", None),
+                    raw=getattr(event, "raw", {}),
+                )
+            elif isinstance(event, StreamProcessingEvent):
+                # VAD lifecycle / processing signal.  An empty partial is used
+                # only to refresh the caller-activity/silence timer.
+                yield STTEvent(type="partial", text="")
+            elif isinstance(event, StreamErrorEvent):
+                yield STTEvent(type="error", text=event.message)
+                break
+    except asyncio.CancelledError:
+        raise
     except Exception as exc:
         raise GnaniError(f"Prisma STT stream error: {exc}") from exc
+    finally:
+        send_task.cancel()
+        try:
+            await send_task
+        except asyncio.CancelledError:
+            pass
+        try:
+            await client.close()
+        except Exception:
+            pass
+
+    if send_error:
+        raise GnaniError(
+            f"Prisma STT send error: {send_error[0]}"
+        ) from send_error[0]
 
 
 # ── Public API ────────────────────────────────────────────────────────────────
 
 
-async def stream(pcm_queue: asyncio.Queue) -> AsyncIterator[STTEvent]:
+async def stream(
+    pcm_queue: asyncio.Queue, language: str = STT_LANGUAGE
+) -> AsyncIterator[STTEvent]:
     """
     Yield STTEvent objects from Prisma for audio in *pcm_queue*.
     One automatic retry on transient errors.
@@ -142,7 +189,7 @@ async def stream(pcm_queue: asyncio.Queue) -> AsyncIterator[STTEvent]:
 
     for attempt in range(2):
         try:
-            async for evt in _real_stream(pcm_queue):
+            async for evt in _real_stream(pcm_queue, language=language):
                 yield evt
             return
         except GnaniError as exc:

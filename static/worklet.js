@@ -2,11 +2,12 @@
  * worklet.js – AudioWorklet processor that captures PCM16 mono at 16 kHz.
  *
  * The worklet receives float32 samples at the browser's native sample rate.
- * It downsamples to 16 kHz, converts to PCM16 (little-endian int16), and
- * posts chunks of ~20 ms (320 samples at 16 kHz) to the main thread.
+ * It downsamples to 16 kHz (box-filtered to reduce aliasing), converts to
+ * PCM16 (little-endian int16), and posts 32 ms chunks (512 samples / 1024
+ * bytes) to the main thread – exactly the frame size Prisma expects.
  *
- * Also performs a simple energy-based VAD: posts {type:"energy",value:N}
- * messages so the main thread can hint at barge-in.
+ * It also posts a throttled RMS energy value (~every 50 ms) used by the main
+ * thread for barge-in detection.
  */
 class PcmCapture extends AudioWorkletProcessor {
   constructor(options) {
@@ -16,10 +17,17 @@ class PcmCapture extends AudioWorkletProcessor {
     // Resample ratio: how many input frames per output frame
     this._ratio = sampleRate / this._targetRate; // sampleRate = global in worklet
     this._accumulator = 0;
+    this._sum = 0;
+    this._count = 0;
     this._outBuf = [];
-    // Chunk size: 20 ms at 16 kHz = 320 samples
-    this._chunkSize = Math.round(this._targetRate * 0.02);
+    // Chunk size: 32 ms at 16 kHz = 512 samples = 1024 bytes (Prisma frame)
+    this._chunkSize = Math.round(this._targetRate * 0.032);
     this._active = true;
+
+    // Throttle energy messages to ~50 ms (the previous per-block rate was
+    // ~340 messages/second and wasted main-thread time).
+    this._blockCount = 0;
+    this._energyEvery = Math.max(1, Math.round((sampleRate * 0.05) / 128));
 
     this.port.onmessage = (e) => {
       if (e.data && e.data.type === 'stop') {
@@ -34,20 +42,31 @@ class PcmCapture extends AudioWorkletProcessor {
     const channel = inputs[0] && inputs[0][0];
     if (!channel || channel.length === 0) return true;
 
-    // Compute energy for VAD hint
-    let sumSq = 0;
-    for (let i = 0; i < channel.length; i++) sumSq += channel[i] * channel[i];
-    const rms = Math.sqrt(sumSq / channel.length);
-    this.port.postMessage({ type: 'energy', value: rms });
+    // Throttled energy for the barge-in hint
+    this._blockCount += 1;
+    if (this._blockCount >= this._energyEvery) {
+      this._blockCount = 0;
+      let sumSq = 0;
+      for (let i = 0; i < channel.length; i++) sumSq += channel[i] * channel[i];
+      this.port.postMessage({
+        type: 'energy',
+        value: Math.sqrt(sumSq / channel.length),
+      });
+    }
 
-    // Nearest-neighbour downsampling + PCM16 conversion
+    // Box-filtered downsampling + PCM16 conversion
     for (let i = 0; i < channel.length; i++) {
+      const s = Math.max(-1, Math.min(1, channel[i]));
+      this._sum += s;
+      this._count += 1;
       this._accumulator += 1;
+
       if (this._accumulator >= this._ratio) {
         this._accumulator -= this._ratio;
-        // Clamp and convert float32 to int16
-        const s = Math.max(-1, Math.min(1, channel[i]));
-        this._outBuf.push(Math.round(s < 0 ? s * 32768 : s * 32767));
+        const avg = this._count ? this._sum / this._count : s;
+        this._sum = 0;
+        this._count = 0;
+        this._outBuf.push(Math.round(avg < 0 ? avg * 32768 : avg * 32767));
       }
 
       if (this._outBuf.length >= this._chunkSize) {
@@ -61,4 +80,3 @@ class PcmCapture extends AudioWorkletProcessor {
 }
 
 registerProcessor('pcm-capture', PcmCapture);
-

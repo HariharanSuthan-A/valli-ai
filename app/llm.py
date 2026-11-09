@@ -252,11 +252,23 @@ async def stream(messages: list[dict]) -> AsyncIterator[str]:
         return
 
     # Attempt 1: Evon LLM
+    produced = False
     try:
         async for tok in _evon_stream(messages):
+            produced = True
             yield tok
         return
     except Exception as evon_err:
+        if produced:
+            # Never restart from scratch after audio has already been spoken:
+            # the caller would hear the answer twice (and duplicate markers).
+            log.error(
+                "Evon failed after partial output; not retrying fallback: %s",
+                evon_err,
+            )
+            raise EvonError(
+                f"Evon streaming failed after partial output: {evon_err}"
+            ) from evon_err
         log.warning("Evon primary endpoint failed: %s", evon_err)
 
     # Attempt 2: Groq Fallback

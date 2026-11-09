@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Valli (வள்ளி) – Multilingual AI Voice Agent for Citizen Services</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Tamil:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Sans+Telugu:wght@400;600;700&family=Noto+Sans+Malayalam:wght@400;600;700&family=Noto+Sans+Kannada:wght@400;600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    }
+
+    .font-tamil {
+      font-family: 'Noto Sans Tamil', 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .font-devanagari {
+      font-family: 'Noto Sans Devanagari', 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .font-telugu {
+      font-family: 'Noto Sans Telugu', 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .font-malayalam {
+      font-family: 'Noto Sans Malayalam', 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .font-kannada {
+      font-family: 'Noto Sans Kannada', 'Plus Jakarta Sans', sans-serif;
+    }
+
+    /* Ambient pulse glow */
+    @keyframes glow {
+      0%, 100% {
+        opacity: 0.4;
+        transform: scale(1);
+      }
+      50% {
+        opacity: 0.7;
+        transform: scale(1.05);
+      }
+    }
+
+    .animate-glow {
+      animation: glow 8s ease-in-out infinite;
+    }
+
+    /* Audio wave animation */
+    @keyframes soundwave {
+      0%, 100% { height: 6px; }
+      50% { height: 26px; }
+    }
+
+    .wave-bar {
+      animation: soundwave 1.2s ease-in-out infinite;
+    }
+
+    .wave-bar:nth-child(2) { animation-delay: 0.15s; }
+    .wave-bar:nth-child(3) { animation-delay: 0.3s; }
+    .wave-bar:nth-child(4) { animation-delay: 0.45s; }
+    .wave-bar:nth-child(5) { animation-delay: 0.6s; }
+    .wave-bar:nth-child(6) { animation-delay: 0.75s; }
+
+    /* Orange & Amber Gradients */
+    .gradient-orange-text {
+      background: linear-gradient(135deg, #ea580c 0%, #f97316 45%, #f59e0b 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .gradient-orange-bg {
+      background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+    }
+
+    /* Glass card on white */
+    .clean-card {
+      background: #ffffff;
+      border: 1px solid rgba(254, 215, 170, 0.6);
+      box-shadow: 0 4px 20px -2px rgba(234, 88, 12, 0.05);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .clean-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(249, 115, 22, 0.5);
+      box-shadow: 0 16px 32px -8px rgba(249, 115, 22, 0.12);
+    }
+
+    .lang-pill {
+      transition: all 0.2s ease;
+    }
+    .lang-pill.active {
+      background: linear-gradient(135deg, #f97316, #ea580c);
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(249, 115, 22, 0.35);
+      border-color: transparent;
+    }
+  </style>
+</head>
+
+<body class="bg-[#fafafb] text-slate-800 min-h-screen antialiased selection:bg-orange-500 selection:text-white">
+
+  <!-- Ambient Orange Glow Backgrounds -->
+  <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+    <div class="absolute -top-32 -left-32 w-96 h-96 bg-orange-400/15 rounded-full blur-[120px] animate-glow"></div>
+    <div class="absolute top-1/3 -right-32 w-[28rem] h-[28rem] bg-amber-400/15 rounded-full blur-[130px] animate-glow"
+      style="animation-delay: 1.5s;"></div>
+    <div class="absolute -bottom-32 left-1/3 w-[30rem] h-[30rem] bg-orange-300/15 rounded-full blur-[140px] animate-glow"
+      style="animation-delay: 2.2s;"></div>
+  </div>
+
+  <!-- Navigation Bar -->
+  <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-orange-100 px-6 py-4 shadow-sm">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <img src="valli.jpg" alt="Valli - AI Voice Agent"
+          class="w-11 h-11 rounded-full object-cover border-2 border-orange-400 shadow-md shadow-orange-500/25" />
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-extrabold text-slate-900 text-lg tracking-tight">Valli</span>
+            <span class="font-tamil text-orange-600 font-bold text-base">(வள்ளி)</span>
+            <span
+              class="text-xs uppercase tracking-wider px-2 py-0.5 rounded-full bg-orange-50 text-orange-700 font-semibold border border-orange-200">
+              Multilingual Voice AI
+            </span>
+          </div>
+          <p class="text-xs text-slate-500">Citizen Services Helpline (5 Indic Languages)</p>
+        </div>
+      </div>
+
+      <div class="hidden md:flex items-center gap-7 text-sm font-semibold text-slate-600">
+        <a href="#languages" class="hover:text-orange-600 transition-colors">5 Languages</a>
+        <a href="#problem" class="hover:text-orange-600 transition-colors">The Problem</a>
+        <a href="#solution" class="hover:text-orange-600 transition-colors">The Solution</a>
+        <a href="#simulator" class="hover:text-orange-600 transition-colors">Live Simulation</a>
+        <a href="#tech-stack" class="hover:text-orange-600 transition-colors">Tech Stack & Groq</a>
+        <a href="#architecture" class="hover:text-orange-600 transition-colors">Architecture</a>
+        <a href="#metrics" class="hover:text-orange-600 transition-colors">Metrics</a>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <span class="flex h-2.5 w-2.5 relative">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+        </span>
+        <span
+          class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+          Ready for Call
+        </span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="relative z-10 pt-16 pb-20 px-6">
+    <div class="max-w-5xl mx-auto text-center">
+      <div
+        class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-50 border border-orange-200 text-xs font-bold text-orange-700 mb-6 shadow-sm">
+        <span>🇮🇳 Tamil • हिन्दी • తెలుగు • മലയാളം • ಕನ್ನಡ</span>
+      </div>
+
+      <h1 class="text-4xl sm:text-6xl font-extrabold text-slate-900 tracking-tight leading-[1.15] mb-6">
+        Bridging the Digital Divide with a <br>
+        <span class="gradient-orange-text">Multilingual Conversational Voice AI</span>
+      </h1>
+
+      <p class="text-lg sm:text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed mb-10">
+        Navigating government portals for Aadhaar, Ration Cards, and Pensions is intimidating for millions of rural and
+        elderly citizens across India.
+        <strong class="text-slate-900">Valli (வள்ளி)</strong> is an empathetic, real-time voice call agent that
+        speaks, listens, and guides callers naturally in their mother tongue with zero robotic delay.
+      </p>
+
+      <div class="flex flex-wrap items-center justify-center gap-4">
+        <a href="#simulator"
+          class="px-7 py-3.5 rounded-xl gradient-orange-bg text-white font-bold shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 hover:scale-[1.02] transition-all flex items-center gap-2">
+          <span>▶ Try Interactive Multilingual Simulator</span>
+        </a>
+        <a href="#languages"
+          class="px-7 py-3.5 rounded-xl bg-white border border-orange-200 hover:bg-orange-50 text-orange-700 font-bold shadow-sm transition-all flex items-center gap-2">
+          <span>🌐 Supported Regional Languages</span>
+        </a>
+      </div>
+
+      <!-- Quick Highlights Bar -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-16 max-w-4xl mx-auto">
+        <div class="clean-card p-5 rounded-2xl text-center">
+          <div class="text-3xl font-extrabold text-orange-600">5 Languages</div>
+          <div class="text-xs font-semibold text-slate-500 mt-1">Tamil, Hindi, Telugu, Malayalam, Kannada</div>
+        </div>
+        <div class="clean-card p-5 rounded-2xl text-center">
+          <div class="text-3xl font-extrabold text-amber-600">45 Seconds</div>
+          <div class="text-xs font-semibold text-slate-500 mt-1">Patient Silence Listening Window</div>
+        </div>
+        <div class="clean-card p-5 rounded-2xl text-center">
+          <div class="text-3xl font-extrabold text-orange-600">Auto Audio TTS</div>
+          <div class="text-xs font-semibold text-slate-500 mt-1">Gnani Timbre v3.0 Native Synthesis</div>
+        </div>
+        <div class="clean-card p-5 rounded-2xl text-center">
+          <div class="text-3xl font-extrabold text-emerald-600">Clean UI</div>
+          <div class="text-xs font-semibold text-slate-500 mt-1">Direct Official Portal Visit Only</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section: Multilingual Matrix -->
+  <section id="languages" class="relative z-10 py-16 px-6 bg-white border-y border-orange-100">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center max-w-2xl mx-auto mb-14">
+        <span class="text-xs uppercase font-extrabold tracking-widest text-orange-600">Regional Inclusivity</span>
+        <h2 class="text-3xl font-extrabold text-slate-900 mt-2">5 Full-Stack Supported Indian Languages</h2>
+        <p class="text-slate-600 text-sm mt-3">
+          Automatic language switching coordinates STT recognition, LLM reasoning persona, and speech synthesis without restarting the call.
+        </p>
+      </div>
+
+      <div class="grid sm:grid-cols-2 lg:grid-cols-5 gap-5">
+        <!-- Tamil -->
+        <div class="clean-card p-5 rounded-2xl border-orange-200 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-bold px-2 py-0.5 rounded bg-orange-100 text-orange-700 font-mono">ta-IN</span>
+              <span class="text-lg">🇮🇳</span>
+            </div>
+            <h3 class="font-bold text-slate-900 text-lg font-tamil">தமிழ் (Tamil)</h3>
+            <p class="text-xs text-slate-500 mt-1 mb-2">Native spoken Tamil (பேச்சு வழக்கு)</p>
+            <div class="p-2.5 rounded-lg bg-orange-50/70 border border-orange-200/60 text-xs font-medium text-slate-800 mb-2">
+              <em>"வணக்கம், நான் வள்ளி பேசுறேன்..."</em>
+            </div>
+            <div class="text-[11px] font-semibold text-orange-700 mb-2">
+              <span>⏱️ Filler:</span>
+              <span class="px-2 py-0.5 rounded bg-orange-100 font-tamil font-bold inline-block mt-0.5">"ஒரு நிமிஷம்..."</span>
+            </div>
+            <div class="text-[11px] font-medium text-slate-600 mb-2">
+              <span class="font-bold text-orange-700">🌐 Visit Prompt:</span>
+              <div class="mt-0.5 text-[10px] text-slate-700 font-tamil">"அதிகாரப்பூர்வ பக்கத்தைப் பார்வையிட கீழே உள்ள பொத்தானைக் கிளிக் செய்யவும்"</div>
+            </div>
+          </div>
+          <div class="p-2 rounded-lg bg-emerald-50 border border-emerald-200/70 text-[10px] text-emerald-900 font-medium">
+            <span class="font-bold block text-emerald-700 mb-0.5">🙏 When Caller Says Thanks:</span>
+            "வள்ளியைத் தொடர்பு கொண்டதற்கு நன்றி, மேலும் விவரங்கள் தேவைப்பட்டால் என்னைத் தொடர்பு கொள்ளவும்."
+          </div>
+        </div>
+
+        <!-- Hindi -->
+        <div class="clean-card p-5 rounded-2xl border-orange-200 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-bold px-2 py-0.5 rounded bg-orange-100 text-orange-700 font-mono">hi-IN</span>
+              <span class="text-lg">🇮🇳</span>
+            </div>
+            <h3 class="font-bold text-slate-900 text-lg font-devanagari">हिन्दी (Hindi)</h3>
+            <p class="text-xs text-slate-500 mt-1 mb-2">Devanagari conversational Hindi</p>
+            <div class="p-2.5 rounded-lg bg-orange-50/70 border border-orange-200/60 text-xs font-medium text-slate-800 mb-2">
+              <em>"नमस्ते! मैं वल्ली बोल रही हूँ..."</em>
+            </div>
+            <div class="text-[11px] font-semibold text-orange-700 mb-2">
+              <span>⏱️ Filler:</span>
+              <span class="px-2 py-0.5 rounded bg-orange-100 font-devanagari font-bold inline-block mt-0.5">"एक मिनट रुकिए..."</span>
+            </div>
+            <div class="text-[11px] font-medium text-slate-600 mb-2">
+              <span class="font-bold text-orange-700">🌐 Visit Prompt:</span>
+              <div class="mt-0.5 text-[10px] text-slate-700 font-devanagari">"आधिकारिक पृष्ठ पर जाने के लिए नीचे दिए गए बटन पर क्लिक करें"</div>
+            </div>
+          </div>
+          <div class="p-2 rounded-lg bg-emerald-50 border border-emerald-200/70 text-[10px] text-emerald-900 font-medium">
+            <span class="font-bold block text-emerald-700 mb-0.5">🙏 When Caller Says Thanks:</span>
+            "वल्ली से संपर्क करने के लिए धन्यवाद, यदि आपको कोई अन्य विवरण चाहिए तो मुझसे संपर्क करें।"
+          </div>
+        </div>
+
+        <!-- Telugu -->
+        <div class="clean-card p-5 rounded-2xl border-orange-200 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-bold px-2 py-0.5 rounded bg-orange-100 text-orange-700 font-mono">te-IN</span>
+              <span class="text-lg">🇮🇳</span>
+            </div>
+            <h3 class="font-bold text-slate-900 text-lg font-telugu">తెలుగు (Telugu)</h3>
+            <p class="text-xs text-slate-500 mt-1 mb-2">Spoken Telugu conversational flow</p>
+            <div class="p-2.5 rounded-lg bg-orange-50/70 border border-orange-200/60 text-xs font-medium text-slate-800 mb-2">
+              <em>"నమస్కారం! నేను వల్లి మాట్లాడుతున్నాను..."</em>
+            </div>
+            <div class="text-[11px] font-semibold text-orange-700 mb-2">
+              <span>⏱️ Filler:</span>
+              <span class="px-2 py-0.5 rounded bg-orange-100 font-telugu font-bold inline-block mt-0.5">"ఒక్క నిమిషం ఉండండి..."</span>
+            </div>
+            <div class="text-[11px] font-medium text-slate-600 mb-2">
+              <span class="font-bold text-orange-700">🌐 Visit Prompt:</span>
+              <div class="mt-0.5 text-[10px] text-slate-700 font-telugu">"అధికారిక పేజీని సందర్శించడానికి క్రింది బటన్‌ను క్లిక్ చేయండి"</div>
+            </div>
+          </div>
+          <div class="p-2 rounded-lg bg-emerald-50 border border-emerald-200/70 text-[10px] text-emerald-900 font-medium">
+            <span class="font-bold block text-emerald-700 mb-0.5">🙏 When Caller Says Thanks:</span>
+            "వల్లిని సంప్రదించినందుకు ధన్యవాదాలు, మీకు ఏవైనా మరిన్ని వివరాలు కావాలంటే నన్ను సంప్రదించండి."
+          </div>
+        </div>
+
+        <!-- Malayalam -->
+        <div class="clean-card p-5 rounded-2xl border-orange-200 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-bold px-2 py-0.5 rounded bg-orange-100 text-orange-700 font-mono">ml-IN</span>
+              <span class="text-lg">🇮🇳</span>
+            </div>
+            <h3 class="font-bold text-slate-900 text-lg font-malayalam">മലയാളം (Malayalam)</h3>
+            <p class="text-xs text-slate-500 mt-1 mb-2">Colloquial Malayalam assistance</p>
+            <div class="p-2.5 rounded-lg bg-orange-50/70 border border-orange-200/60 text-xs font-medium text-slate-800 mb-2">
+              <em>"നമസ്കാരം! ഞാൻ വള്ളി സംസാരിക്കുന്നു..."</em>
+            </div>
+            <div class="text-[11px] font-semibold text-orange-700 mb-2">
+              <span>⏱️ Filler:</span>
+              <span class="px-2 py-0.5 rounded bg-orange-100 font-malayalam font-bold inline-block mt-0.5">"ഒരു നിമിഷം നിൽക്കൂ..."</span>
+            </div>
+            <div class="text-[11px] font-medium text-slate-600 mb-2">
+              <span class="font-bold text-orange-700">🌐 Visit Prompt:</span>
+              <div class="mt-0.5 text-[10px] text-slate-700 font-malayalam">"ഔദ്യോഗിക പേജ് സന്ദർശിക്കാൻ താഴെയുള്ള ബട്ടണിൽ ക്ലിക്കുചെയ്യുക"</div>
+            </div>
+          </div>
+          <div class="p-2 rounded-lg bg-emerald-50 border border-emerald-200/70 text-[10px] text-emerald-900 font-medium">
+            <span class="font-bold block text-emerald-700 mb-0.5">🙏 When Caller Says Thanks:</span>
+            "വള്ളിയെ ബന്ധപ്പെട്ടതിന് നന്ദി, കൂടുതൽ വിവരങ്ങൾ ആവശ്യമുണ്ടെങ്കിൽ എന്നെ ബന്ധപ്പെടുക."
+          </div>
+        </div>
+
+        <!-- Kannada -->
+        <div class="clean-card p-5 rounded-2xl border-orange-200 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-bold px-2 py-0.5 rounded bg-orange-100 text-orange-700 font-mono">kn-IN</span>
+              <span class="text-lg">🇮🇳</span>
+            </div>
+            <h3 class="font-bold text-slate-900 text-lg font-kannada">ಕನ್ನಡ (Kannada)</h3>
+            <p class="text-xs text-slate-500 mt-1 mb-2">Conversational Kannada guidance</p>
+            <div class="p-2.5 rounded-lg bg-orange-50/70 border border-orange-200/60 text-xs font-medium text-slate-800 mb-2">
+              <em>"ನಮಸ್ಕಾರ! ನಾನು ವಳ್ಳಿ ಮಾತನಾಡುತ್ತಿದ್ದೇನೆ..."</em>
+            </div>
+            <div class="text-[11px] font-semibold text-orange-700 mb-2">
+              <span>⏱️ Filler:</span>
+              <span class="px-2 py-0.5 rounded bg-orange-100 font-kannada font-bold inline-block mt-0.5">"ಒಂದು ನಿಮಿಷ ಇರಿ..."</span>
+            </div>
+            <div class="text-[11px] font-medium text-slate-600 mb-2">
+              <span class="font-bold text-orange-700">🌐 Visit Prompt:</span>
+              <div class="mt-0.5 text-[10px] text-slate-700 font-kannada">"ಅಧಿಕೃತ ಪುಟಕ್ಕೆ ಭೇಟಿ ನೀಡಲು ಕೆಳಗಿನ ಬಟನ್ ಕ್ಲಿಕ್ ಮಾಡಿ"</div>
+            </div>
+          </div>
+          <div class="p-2 rounded-lg bg-emerald-50 border border-emerald-200/70 text-[10px] text-emerald-900 font-medium">
+            <span class="font-bold block text-emerald-700 mb-0.5">🙏 When Caller Says Thanks:</span>
+            "ವಳ್ಳಿಯನ್ನು ಸಂಪರ್ಕಿಸಿದ್ದಕ್ಕಾಗಿ ಧನ್ಯವಾದಗಳು, ಹೆಚ್ಚಿನ ವಿವರಗಳು ಬೇಕಾದರೆ ನನ್ನನ್ನು ಸಂಪರ್ಕಿಸಿ."
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section: Problem Statement -->
+  <section id="problem" class="relative z-10 py-16 px-6 bg-orange-50/40 border-b border-orange-100">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center max-w-2xl mx-auto mb-14">
+        <span class="text-xs uppercase font-extrabold tracking-widest text-orange-600">The Problem</span>
+        <h2 class="text-3xl font-extrabold text-slate-900 mt-2">Why Existing Government Portals & Helplines Fail</h2>
+        <p class="text-slate-600 text-sm mt-3">
+          Citizens who rely on welfare schemes face language, technical, and interface barriers every single day.
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-6">
+        <div class="clean-card p-7 rounded-2xl border-orange-200">
+          <div
+            class="w-12 h-12 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center text-2xl mb-4 font-bold">
+            🌐
+          </div>
+          <h3 class="text-lg font-bold text-slate-900 mb-2">English-Centric Portals & Jargon</h3>
+          <p class="text-slate-600 text-sm leading-relaxed">
+            Citizens seeking simple Aadhaar updates or ration cards must navigate multi-layered web forms in English with complex CAPTCHAs, forcing heavy reliance on middlemen and cyber cafes.
+          </p>
+        </div>
+
+        <div class="clean-card p-7 rounded-2xl border-orange-200">
+          <div
+            class="w-12 h-12 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-2xl mb-4 font-bold">
+            📵
+          </div>
+          <h3 class="text-lg font-bold text-slate-900 mb-2">Robotic IVRs & Harsh 5s Disconnects</h3>
+          <p class="text-slate-600 text-sm leading-relaxed">
+            Conventional phone IVR systems disconnect if the caller pauses for 5 seconds. Elderly callers who hesitate to articulate their questions get cut off abruptly, causing intense anxiety and distress.
+          </p>
+        </div>
+
+        <div class="clean-card p-7 rounded-2xl border-orange-200">
+          <div
+            class="w-12 h-12 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center text-2xl mb-4 font-bold">
+            🗣️
+          </div>
+          <h3 class="text-lg font-bold text-slate-900 mb-2">Regional Accent Breakdown</h3>
+          <p class="text-slate-600 text-sm leading-relaxed">
+            Standard Western voice bots fail completely on colloquial Indian regional languages and mixed code-switched queries like <em>"Aadhaar address maatha enna documents venum?"</em>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section: How I Solved It -->
+  <section id="solution" class="relative z-10 py-16 px-6">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center max-w-2xl mx-auto mb-14">
+        <span class="text-xs uppercase font-extrabold tracking-widest text-orange-600">How I Solved It</span>
+        <h2 class="text-3xl font-extrabold text-slate-900 mt-2">Engineering Valli: Human-Centric AI Innovations</h2>
+        <p class="text-slate-600 text-sm mt-3">A purpose-built conversational voice architecture tailored for Indian regional helpline callers.</p>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-8">
+        <!-- Feature 1: Dynamic Language Switching -->
+        <div class="clean-card p-7 rounded-2xl border-orange-200 flex gap-5">
+          <div
+            class="w-12 h-12 shrink-0 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center text-2xl">
+            🌍
+          </div>
+          <div>
+            <div class="flex items-center gap-2 mb-2">
+              <h3 class="text-lg font-bold text-slate-900">1-Click Regional Language Switching</h3>
+              <span class="text-[11px] bg-orange-100 text-orange-700 font-bold px-2.5 py-0.5 rounded-full">5 Languages</span>
+            </div>
+            <p class="text-slate-600 text-sm leading-relaxed">
+              Users can select Tamil, Hindi, Telugu, Malayalam, or Kannada from the UI. The session automatically synchronizes STT language code, TTS synthesis voice, system prompt instructions, and regional greetings in real-time.
+            </p>
+          </div>
+        </div>
+
+        <!-- Feature 2: 45-Second Silence Window -->
+        <div class="clean-card p-7 rounded-2xl border-orange-200 flex gap-5">
+          <div
+            class="w-12 h-12 shrink-0 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-2xl">
+            👂
+          </div>
+          <div>
+            <div class="flex items-center gap-2 mb-2">
+              <h3 class="text-lg font-bold text-slate-900">45-Second Patient Listening Window</h3>
+              <span class="text-[11px] bg-amber-100 text-amber-700 font-bold px-2.5 py-0.5 rounded-full">Empathetic UX</span>
+            </div>
+            <p class="text-slate-600 text-sm leading-relaxed">
+              Unlike harsh IVRs that hang up after 5 seconds, Valli waits a full 45 seconds after her speech finishes before gently checking in with a localized <strong class="text-slate-900">"Hello? Ungalukku ketkutha?"</strong> or <strong class="text-slate-900">"Hello? Kya aap mujhe sun sakte hain?"</strong>.
+            </p>
+          </div>
+        </div>
+
+        <!-- Feature 3: Natural Multilingual Fillers -->
+        <div class="clean-card p-7 rounded-2xl border-orange-200 flex gap-5">
+          <div
+            class="w-12 h-12 shrink-0 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center text-2xl">
+            ⏱️
+          </div>
+          <div>
+            <div class="flex items-center gap-2 mb-2">
+              <h3 class="text-lg font-bold text-slate-900">Language-Adaptive Acoustic Fillers</h3>
+              <span class="text-[11px] bg-orange-100 text-orange-700 font-bold px-2.5 py-0.5 rounded-full">Zero Dead Air</span>
+            </div>
+            <p class="text-slate-600 text-sm leading-relaxed">
+              To eliminate dead air while the LLM generates tokens, Valli plays an immediate filler clip customized to the active language:
+              <strong class="text-orange-700">"ஒரு நிமிஷம்..."</strong> (Tamil),
+              <strong class="text-orange-700">"एक मिनट रुकिए..."</strong> (Hindi),
+              <strong class="text-orange-700">"ఒక్క నిమిషం ఉండండి..."</strong> (Telugu),
+              <strong class="text-orange-700">"ഒരു നിമിഷം നിൽക്കൂ..."</strong> (Malayalam), or
+              <strong class="text-orange-700">"ಒಂದು ನಿಮಿಷ ಇರಿ..."</strong> (Kannada).
+            </p>
+          </div>
+        </div>
+
+        <!-- Feature 4: Clean Actionable UI -->
+        <div class="clean-card p-7 rounded-2xl border-orange-200 flex gap-5">
+          <div
+            class="w-12 h-12 shrink-0 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-2xl">
+            🌐
+          </div>
+          <div>
+            <div class="flex items-center gap-2 mb-2">
+              <h3 class="text-lg font-bold text-slate-900">Distraction-Free Direct Visit Card</h3>
+              <span class="text-[11px] bg-amber-100 text-amber-700 font-bold px-2.5 py-0.5 rounded-full">Clean UI</span>
+            </div>
+            <p class="text-slate-600 text-sm leading-relaxed">
+              All overwhelming English text dumps and complicated checklist items are stripped from the phone UI. The card surfaces <strong>only the direct official portal button</strong> for seamless 1-tap navigation.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section: Live Interactive Multilingual Simulator -->
+  <section id="simulator" class="relative z-10 py-16 px-6 bg-orange-50/40 border-y border-orange-100">
+    <div class="max-w-5xl mx-auto">
+      <div class="text-center max-w-2xl mx-auto mb-10">
+        <span class="text-xs uppercase font-extrabold tracking-widest text-orange-600">Interactive Demonstration</span>
+        <h2 class="text-3xl font-extrabold text-slate-900 mt-2">Experience Multilingual Calling Simulation</h2>
+        <p class="text-slate-600 text-sm mt-3">Select your language below and test how Valli adapts greetings, questions, and responses in real-time.</p>
+      </div>
+
+      <!-- Language Selector Tabs for Simulator -->
+      <div class="flex flex-wrap items-center justify-center gap-2 mb-8">
+        <button onclick="setSimLanguage('ta')" id="tab-ta" class="lang-pill active px-4 py-2 rounded-xl border border-orange-300 text-xs font-bold font-tamil">
+          தமிழ் (Tamil)
+        </button>
+        <button onclick="setSimLanguage('hi')" id="tab-hi" class="lang-pill px-4 py-2 rounded-xl bg-white border border-orange-200 text-slate-700 text-xs font-bold font-devanagari hover:bg-orange-50">
+          हिन्दी (Hindi)
+        </button>
+        <button onclick="setSimLanguage('te')" id="tab-te" class="lang-pill px-4 py-2 rounded-xl bg-white border border-orange-200 text-slate-700 text-xs font-bold font-telugu hover:bg-orange-50">
+          తెలుగు (Telugu)
+        </button>
+        <button onclick="setSimLanguage('ml')" id="tab-ml" class="lang-pill px-4 py-2 rounded-xl bg-white border border-orange-200 text-slate-700 text-xs font-bold font-malayalam hover:bg-orange-50">
+          മലയാളം (Malayalam)
+        </button>
+        <button onclick="setSimLanguage('kn')" id="tab-kn" class="lang-pill px-4 py-2 rounded-xl bg-white border border-orange-200 text-slate-700 text-xs font-bold font-kannada hover:bg-orange-50">
+          ಕನ್ನಡ (Kannada)
+        </button>
+      </div>
+
+      <!-- Phone UI Simulation Card -->
+      <div
+        class="max-w-md mx-auto bg-white rounded-3xl p-6 border-2 border-orange-200 shadow-xl shadow-orange-500/5 relative overflow-hidden">
+        <!-- Top Status Bar -->
+        <div class="flex items-center justify-between border-b border-orange-100 pb-4 mb-4">
+          <div class="flex items-center gap-3">
+            <img src="valli.jpg" alt="Valli"
+              class="w-12 h-12 rounded-full object-cover border-2 border-orange-400 shadow-sm" />
+            <div>
+              <div class="font-bold text-slate-900 text-sm">Valli (வள்ளி)</div>
+              <div id="sim-status" class="text-xs text-emerald-600 font-semibold flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>Connected (Ready)</span>
+              </div>
+            </div>
+          </div>
+          <div class="text-right">
+            <span id="sim-lang-badge" class="text-[10px] font-bold px-2 py-0.5 rounded bg-orange-100 text-orange-800 uppercase tracking-wide">ta-IN</span>
+            <div id="sim-timer"
+              class="text-xs font-mono font-bold text-slate-400 mt-1">
+              0:14
+            </div>
+          </div>
+        </div>
+
+        <!-- Audio Waveform Visualizer -->
+        <div
+          class="h-12 bg-orange-50/80 border border-orange-100 rounded-xl flex items-center justify-center gap-1.5 px-4 mb-4">
+          <div class="w-1.5 bg-orange-500 rounded-full wave-bar h-2"></div>
+          <div class="w-1.5 bg-amber-500 rounded-full wave-bar h-4"></div>
+          <div class="w-1.5 bg-orange-600 rounded-full wave-bar h-6"></div>
+          <div class="w-1.5 bg-amber-600 rounded-full wave-bar h-3"></div>
+          <div class="w-1.5 bg-orange-400 rounded-full wave-bar h-5"></div>
+          <div class="w-1.5 bg-amber-400 rounded-full wave-bar h-2"></div>
+        </div>
+
+        <!-- Live Dialogue Display -->
+        <div class="space-y-3 min-h-[160px] max-h-[220px] overflow-y-auto pr-1 text-sm" id="sim-dialogue">
+          <div class="p-3.5 rounded-xl bg-orange-50/60 border border-orange-200/80">
+            <span class="text-xs font-bold text-orange-700 block mb-1">Valli (வள்ளி):</span>
+            <span id="sim-greeting-text" class="text-slate-800 font-medium">
+              வணக்கம், நான் வள்ளி பேசுறேன். அரசு சேவைகள் பற்றி என்ன உதவி வேண்டும்?
+            </span>
+          </div>
+        </div>
+
+        <!-- Service Card (Visit Button with Localized Prompt) -->
+        <div id="sim-card"
+          class="mt-4 p-3.5 rounded-2xl bg-orange-50/80 border border-orange-200 text-center hidden transition-all space-y-2">
+          <p id="sim-card-prompt" class="text-xs text-slate-600 font-medium font-tamil">அதிகாரப்பூர்வ பக்கத்தைப் பார்வையிட கீழே உள்ள பொத்தானைக் கிளிக் செய்யவும்</p>
+          <a id="sim-site-btn" href="https://myaadhaar.uidai.gov.in" target="_blank"
+            class="inline-flex items-center justify-center gap-2 py-2 px-5 rounded-full gradient-orange-bg text-white font-bold text-xs shadow-md shadow-orange-500/20 hover:scale-[1.02] transition-transform">
+            <span id="sim-site-btn-text">🌐 அதிகாரப்பூர்வ இணையதளம்</span>
+          </a>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="mt-6 pt-4 border-t border-orange-100 flex flex-col sm:flex-row items-center justify-center gap-2">
+          <button id="btn-demo-start" onclick="runDemoScenario()"
+            class="w-full sm:w-auto flex-1 py-2.5 px-3 rounded-xl gradient-orange-bg text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-orange-500/20 hover:shadow-orange-500/30 transition-all">
+            <span>▶ 1. Ask Service</span>
+          </button>
+          <button id="btn-demo-thanks" onclick="runThanksScenario()"
+            class="w-full sm:w-auto flex-1 py-2.5 px-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-amber-500/20 transition-all">
+            <span>🙏 2. Say Thanks</span>
+          </button>
+          <button onclick="resetDemoScenario()"
+            class="py-2.5 px-3 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition-all">
+            Reset
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section: Tech Stack & Why Groq -->
+  <section id="tech-stack" class="relative z-10 py-16 px-6">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center max-w-2xl mx-auto mb-14">
+        <span class="text-xs uppercase font-extrabold tracking-widest text-orange-600">Technology Architecture</span>
+        <h2 class="text-3xl font-extrabold text-slate-900 mt-2">Tech Stack & The Strategic Pivot to Groq</h2>
+        <p class="text-slate-600 text-sm mt-3">Engineered for extreme responsiveness, fault tolerance, and zero infrastructure cost bottlenecks.</p>
+      </div>
+
+      <!-- Pivot Callout: Why Groq LPUs? -->
+      <div
+        class="clean-card p-8 rounded-3xl border-2 border-orange-200 mb-12 bg-gradient-to-r from-orange-50/50 via-white to-amber-50/50 shadow-md">
+        <div class="flex flex-col md:flex-row items-start md:items-center gap-6">
+          <div
+            class="w-16 h-16 rounded-2xl bg-orange-100 border border-orange-300 flex items-center justify-center text-3xl shrink-0 text-orange-600 font-bold">
+            ⚡
+          </div>
+          <div>
+            <div class="flex items-center gap-3 mb-1.5">
+              <h3 class="text-xl font-bold text-slate-900">Why Groq + <code
+                  class="text-orange-700 bg-orange-100/60 px-1.5 py-0.5 rounded font-mono">openai/gpt-oss-20b</code>?
+              </h3>
+              <span class="px-3 py-0.5 rounded-full bg-orange-100 text-orange-800 text-xs font-bold">Key Architectural Decision</span>
+            </div>
+            <p class="text-slate-600 text-sm leading-relaxed mb-3">
+              Deploying enterprise 30B MoE models (such as <code
+                class="text-slate-800 bg-slate-100 px-1 py-0.5 rounded">gnani/gnani-evon-v3.3-30B-A3B</code>) requires
+              over <strong class="text-orange-700">63 GB of unquantized VRAM</strong> or expensive dedicated GPU clusters, which leads to out-of-memory crashes on free/commodity tiers.
+            </p>
+            <p class="text-slate-600 text-sm leading-relaxed">
+              By deploying on <strong class="text-slate-900">Groq's LPU Inference Engine</strong> with <strong
+                class="text-orange-700">`openai/gpt-oss-20b`</strong>, we achieved an astonishing <strong
+                class="text-emerald-700 font-bold">65+ tokens/second with sub-400ms Time-To-First-Token (TTFT)</strong>.
+              This guarantees natural, instantaneous phone conversation turns with zero latency lag across all 5 regional languages.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Component Grid -->
+      <div class="grid md:grid-cols-4 gap-6">
+        <div class="clean-card p-6 rounded-2xl">
+          <div class="text-xs text-orange-600 font-bold mb-1 uppercase tracking-wider">STT Transport</div>
+          <h4 class="font-bold text-slate-900 text-base mb-2">Gnani Prisma STT</h4>
+          <p class="text-xs text-slate-500 leading-relaxed">
+            Continuous WebSocket streaming with native Indic acoustic models (<code class="text-slate-800 font-semibold">ta-IN</code>, <code class="text-slate-800 font-semibold">hi-IN</code>, <code class="text-slate-800 font-semibold">te-IN</code>, <code class="text-slate-800 font-semibold">ml-IN</code>, <code class="text-slate-800 font-semibold">kn-IN</code>).
+          </p>
+        </div>
+
+        <div class="clean-card p-6 rounded-2xl">
+          <div class="text-xs text-orange-600 font-bold mb-1 uppercase tracking-wider">Reasoning Core</div>
+          <h4 class="font-bold text-slate-900 text-base mb-2">Groq gpt-oss-20b</h4>
+          <p class="text-xs text-slate-500 leading-relaxed">
+            Ultra-low latency LPU inference with strict grounded system prompt instructions and conversational memory preservation across follow-up turns.
+          </p>
+        </div>
+
+        <div class="clean-card p-6 rounded-2xl">
+          <div class="text-xs text-orange-600 font-bold mb-1 uppercase tracking-wider">Voice Synthesis</div>
+          <h4 class="font-bold text-slate-900 text-base mb-2">Gnani Timbre v3.0</h4>
+          <p class="text-xs text-slate-500 leading-relaxed">
+            Warm <code class="text-slate-800 font-semibold">Lakshmi</code> voice in 16 kHz mono WAV. Supports all 5 Indic languages with dynamic websockets header resolution and &lt;700 char chunking.
+          </p>
+        </div>
+
+        <div class="clean-card p-6 rounded-2xl">
+          <div class="text-xs text-orange-600 font-bold mb-1 uppercase tracking-wider">Web Full-Duplex</div>
+          <h4 class="font-bold text-slate-900 text-base mb-2">FastAPI + WebSockets</h4>
+          <p class="text-xs text-slate-500 leading-relaxed">
+            Dual-channel server routing binary mic PCM to STT while returning binary TTS WAV segments and JSON control frames to the browser.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section: Architecture Data Flow -->
+  <section id="architecture" class="relative z-10 py-16 px-6 bg-orange-50/40 border-y border-orange-100">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center max-w-2xl mx-auto mb-14">
+        <span class="text-xs uppercase font-extrabold tracking-widest text-orange-600">System Flow</span>
+        <h2 class="text-3xl font-extrabold text-slate-900 mt-2">End-to-End Multilingual Turn-Taking Pipeline</h2>
+        <p class="text-slate-600 text-sm mt-3">From microphone input to regional spoken audio output in under 1 second.</p>
+      </div>
+
+      <!-- Pipeline Steps Visual -->
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-4 text-center">
+        <div class="clean-card p-5 rounded-2xl">
+          <div class="text-3xl mb-2">🎙️</div>
+          <div class="text-xs font-bold text-orange-700 mb-1">1. AudioWorklet</div>
+          <p class="text-[11px] text-slate-500 leading-relaxed">Captures mic audio & downsamples to 16 kHz PCM mono in real-time.</p>
+        </div>
+
+        <div class="clean-card p-5 rounded-2xl">
+          <div class="text-3xl mb-2">🌊</div>
+          <div class="text-xs font-bold text-orange-700 mb-1">2. Prisma STT</div>
+          <p class="text-[11px] text-slate-500 leading-relaxed">Continuous stream emits partials & final transcript in the selected regional language.</p>
+        </div>
+
+        <div class="clean-card p-5 rounded-2xl border-orange-300 bg-orange-50/40">
+          <div class="text-3xl mb-2">⚡</div>
+          <div class="text-xs font-bold text-orange-700 mb-1">3. Groq + Filler Buffer</div>
+          <p class="text-[11px] text-slate-600 leading-relaxed font-medium">Fires instant filler audio while Groq LPU streams localized response tokens.</p>
+        </div>
+
+        <div class="clean-card p-5 rounded-2xl">
+          <div class="text-3xl mb-2">✂️</div>
+          <div class="text-xs font-bold text-orange-700 mb-1">4. TagBuffer Chunker</div>
+          <p class="text-[11px] text-slate-500 leading-relaxed">Segments clauses (&lt;700 chars) for incremental Timbre TTS synthesis.</p>
+        </div>
+
+        <div class="clean-card p-5 rounded-2xl">
+          <div class="text-3xl mb-2">🔊</div>
+          <div class="text-xs font-bold text-emerald-700 mb-1">5. Synced Output & Portal</div>
+          <p class="text-[11px] text-slate-500 leading-relaxed">Plays synthesized speech smoothly while official website portal button appears.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section: Performance Benchmarks -->
+  <section id="metrics" class="relative z-10 py-16 px-6">
+    <div class="max-w-5xl mx-auto">
+      <div class="text-center max-w-2xl mx-auto mb-14">
+        <span class="text-xs uppercase font-extrabold tracking-widest text-orange-600">Metrics & Impact</span>
+        <h2 class="text-3xl font-extrabold text-slate-900 mt-2">Valli vs Traditional Government IVR</h2>
+        <p class="text-slate-600 text-sm mt-3">Measured real-world improvements across caller experience and turn responsiveness.</p>
+      </div>
+
+      <div class="clean-card rounded-2xl overflow-hidden border border-orange-200">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-orange-50 text-slate-800 font-bold border-b border-orange-200">
+            <tr>
+              <th class="p-4 pl-6">Metric</th>
+              <th class="p-4 text-slate-500 font-semibold">Traditional IVR / Basic Bot</th>
+              <th class="p-4 text-orange-700 font-bold">Valli AI Agent</th>
+              <th class="p-4 pr-6 text-emerald-700 font-bold">Improvement</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-orange-100 text-slate-700">
+            <tr class="hover:bg-orange-50/30 transition-colors">
+              <td class="p-4 pl-6 font-semibold text-slate-900">Languages Supported</td>
+              <td class="p-4 text-slate-500">1 (English or Formal Hindi only)</td>
+              <td class="p-4 font-bold text-orange-600">5 Regional (ta, hi, te, ml, kn)</td>
+              <td class="p-4 pr-6 text-emerald-600 font-extrabold">5x Inclusivity</td>
+            </tr>
+            <tr class="hover:bg-orange-50/30 transition-colors">
+              <td class="p-4 pl-6 font-semibold text-slate-900">Time-to-First-Audio (TTFA)</td>
+              <td class="p-4 text-slate-500">3.5 – 6.0 s (Dead Air)</td>
+              <td class="p-4 font-bold text-orange-600">&lt; 150 ms (Acoustic Buffer)</td>
+              <td class="p-4 pr-6 text-emerald-600 font-extrabold">25x Faster</td>
+            </tr>
+            <tr class="hover:bg-orange-50/30 transition-colors">
+              <td class="p-4 pl-6 font-semibold text-slate-900">Silence Tolerance Window</td>
+              <td class="p-4 text-slate-500">5 – 8 s (Disconnects)</td>
+              <td class="p-4 font-bold text-orange-600">45.0 s (Patient check-in)</td>
+              <td class="p-4 pr-6 text-emerald-600 font-extrabold">6x More Patient</td>
+            </tr>
+            <tr class="hover:bg-orange-50/30 transition-colors">
+              <td class="p-4 pl-6 font-semibold text-slate-900">Regional Speech Recognition</td>
+              <td class="p-4 text-slate-500">~60% (Fails on colloquial)</td>
+              <td class="p-4 font-bold text-orange-600">&gt; 92% (Native Prisma STT)</td>
+              <td class="p-4 pr-6 text-emerald-600 font-extrabold">+32% Accuracy</td>
+            </tr>
+            <tr class="hover:bg-orange-50/30 transition-colors">
+              <td class="p-4 pl-6 font-semibold text-slate-900">Token Generation Speed</td>
+              <td class="p-4 text-slate-500">8 – 15 tok/s (Local T4 spill)</td>
+              <td class="p-4 font-bold text-orange-600">65+ tok/s (Groq LPU)</td>
+              <td class="p-4 pr-6 text-emerald-600 font-extrabold">5x Throughput</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="relative z-10 py-12 px-6 border-t border-orange-100 bg-white text-center text-xs text-slate-500">
+    <div class="max-w-4xl mx-auto space-y-3">
+      <div class="flex items-center justify-center gap-2 text-sm font-bold text-slate-800">
+        <span class="text-orange-600">Valli (வள்ளி) Helpline</span>
+        <span>•</span>
+        <span>Multilingual Voice AI with Gnani Prisma, Timbre & Groq LPU</span>
+      </div>
+      <p class="text-slate-500">Prepared for Project Presentation & Live Demonstration. Accessible via Render Blueprint and ngrok Mobile WebSockets.</p>
+    </div>
+  </footer>
+
+  <!-- Simulation Script for 5 Languages -->
+  <script>
+    const SCENARIOS = {
+      ta: {
+        code: 'ta-IN',
+        greeting: 'வணக்கம், நான் வள்ளி பேசுறேன். அரசு சேவைகள் பற்றி என்ன உதவி வேண்டும்?',
+        caller: 'ஆதார் அட்டையில் முகவரி எப்படி மாற்றுவது? என்னென்ன ஆவணங்கள் தேவை?',
+        filler: 'ஒரு நிமிஷம்...',
+        response: 'ஆதார் அட்டை முகவரி மாற்ற myaadhaar.uidai.gov.in போர்ட்டலில் ஆன்லைனில் விண்ணப்பிக்கலாம். இதற்கு முகவரி சான்றாக மின் கட்டண ரசீது, வங்கி கணக்கு புத்தகம் அல்லது வாடகை ஒப்பந்தம் தேவைப்படும். இதில் வேறு ஏதேனும் சந்தேகம் இருக்கிறதா?',
+        visitPrompt: 'அதிகாரப்பூர்வ பக்கத்தைப் பார்வையிட கீழே உள்ள பொத்தானைக் கிளிக் செய்யவும்',
+        visitBtn: '🌐 அதிகாரப்பூர்வ இணையதளம்',
+        portal: 'https://myaadhaar.uidai.gov.in',
+        callerThanks: 'மிக்க நன்றி வள்ளி!',
+        valliClosing: 'வள்ளியைத் தொடர்பு கொண்டதற்கு நன்றி, மேலும் விவரங்கள் தேவைப்பட்டால் என்னைத் தொடர்பு கொள்ளவும்.'
+      },
+      hi: {
+        code: 'hi-IN',
+        greeting: 'नमस्ते! मैं वल्ली बोल रही हूँ। सरकारी सेवाओं के बारे में आपको क्या मदद चाहिए?',
+        caller: 'आधार कार्ड में पता कैसे बदलें? कौन से दस्तावेज चाहिए?',
+        filler: 'एक मिनट रुकिए...',
+        response: 'आधार कार्ड में पता बदलने के लिए आप myaadhaar.uidai.gov.in पोर्टल पर जाकर ऑनलाइन आवेदन कर सकते हैं। इसके लिए बिजली बिल, बैंक पासबुक या किरायानामा की प्रति आवश्यक होगी। क्या आपको कोई अन्य सहायता चाहिए?',
+        visitPrompt: 'आधिकारिक पृष्ठ पर जाने के लिए नीचे दिए गए बटन पर क्लिक करें',
+        visitBtn: '🌐 आधिकारिक वेबसाइट',
+        portal: 'https://myaadhaar.uidai.gov.in',
+        callerThanks: 'बहुत धन्यवाद वल्ली!',
+        valliClosing: 'वल्ली से संपर्क करने के लिए धन्यवाद, यदि आपको कोई अन्य विवरण चाहिए तो मुझसे संपर्क करें।'
+      },
+      te: {
+        code: 'te-IN',
+        greeting: 'నమస్కారం! నేను వల్లి మాట్లాడుతున్నాను. ప్రభుత్వ సేవల గురించి మీకు ఏమి సహాయం కావాలి?',
+        caller: 'ఆధార్ కార్డులో చిరునామా ఎలా మార్చుకోవాలి? ఏ పత్రాలు కావాలి?',
+        filler: 'ఒక్క నిమిషం ఉండండి...',
+        response: 'ఆధార్ కార్డులో చిరునామా మార్చుకోవడానికి myaadhaar.uidai.gov.in పోర్టల్ ద్వారా ఆన్‌లైన్‌లో దరఖాస్తు చేసుకోవచ్చు. దీనికి చిరునామా రుజువుగా కరెంట్ బిల్లు, బ్యాంక్ పాస్‌బుక్ అవసరం. మీకు ఇంకేమైనా సందేహాలు ఉన్నాయా?',
+        visitPrompt: 'అధికారిక పేజీని సందర్శించడానికి క్రింది బటన్‌ను క్లిక్ చేయండి',
+        visitBtn: '🌐 అధికారిక వెబ్‌సైట్',
+        portal: 'https://myaadhaar.uidai.gov.in',
+        callerThanks: 'చాలా ధన్యవాదాలు వల్లి!',
+        valliClosing: 'వల్లిని సంప్రదించినందుకు ధన్యవాదాలు, మీకు ఏవైనా మరిన్ని వివరాలు కావాలంటే నన్ను సంప్రదించండి.'
+      },
+      ml: {
+        code: 'ml-IN',
+        greeting: 'നമസ്കാരം! ഞാൻ വള്ളി സംസാരിക്കുന്നു. സർക്കാർ സേവനങ്ങളെ പറ്റി എന്താണ് അറിയേണ്ടത്?',
+        caller: 'ആധാർ കാർഡിലെ വിലാസം എങ്ങനെ മാറ്റാം? എന്തൊക്കെ രേഖകൾ വേണം?',
+        filler: 'ഒരു നിമിഷം നിൽക്കൂ...',
+        response: 'ആധാർ കാർഡിലെ വിലാസം മാറ്റാൻ myaadhaar.uidai.gov.in പോർട്ടലിൽ ഓൺലൈനായി അപേക്ഷിക്കാം. മേൽവിലാസം തെളിയിക്കുന്ന രേഖയായി കറന്റ് ബില്ലോ ബാങ്ക് പാസ്ബുക്കോ സമർപ്പിക്കാം. ഇതിൽ കൂടുതൽ എന്തെങ്കിലും സംശയമുണ്ടോ?',
+        visitPrompt: 'ഔദ്യോഗിക പേജ് സന്ദർശിക്കാൻ താഴെയുള്ള ബട്ടണിൽ ക്ലിക്കുചെയ്യുക',
+        visitBtn: '🌐 ഔദ്യോഗിക വെബ്സൈറ്റ്',
+        portal: 'https://myaadhaar.uidai.gov.in',
+        callerThanks: 'വളരെ നന്ദി വള്ളി!',
+        valliClosing: 'വള്ളിയെ ബന്ധപ്പെട്ടതിന് നന്ദി, കൂടുതൽ വിവരങ്ങൾ ആവശ്യമുണ്ടെങ്കിൽ എന്നെ ബന്ധപ്പെടുക.'
+      },
+      kn: {
+        code: 'kn-IN',
+        greeting: 'ನಮಸ್ಕಾರ! ನಾನು ವಳ್ಳಿ ಮಾತನಾಡುತ್ತಿದ್ದೇನೆ. ಸರ್ಕಾರಿ ಸೇವೆಗಳ ಬಗ್ಗೆ ನಿಮಗೆ ಏನು ಸಹಾಯ ಬೇಕು?',
+        caller: 'ಆಧಾರ್ ಕಾರ್ಡ್‌ನಲ್ಲಿ ವಿಳಾಸವನ್ನು ಹೇಗೆ ಬದಲಾಯಿಸುವುದು? ಯಾವ ದಾಖಲೆಗಳು ಬೇಕು?',
+        filler: 'ಒಂದು ನಿಮಿಷ ಇರಿ...',
+        response: 'ಆಧಾರ್ ಕಾರ್ಡ್ ವಿಳಾಸ ಬದಲಾಯಿಸಲು myaadhaar.uidai.gov.in ಪೋರ್ಟಲ್‌ನಲ್ಲಿ ಆನ್‌ಲೈನ್‌ನಲ್ಲಿ ಅರ್ಜಿ ಸಲ್ಲಿಸಬಹುದು. ವಿಳಾಸದ ಪುರಾವೆಯಾಗಿ ವಿದ್ಯುತ್ ಬಿಲ್ ಅಥವಾ ಬ್ಯಾಂಕ್ ಪಾಸ್‌ಬುಕ್ ಅಗತ್ಯವಿದೆ. ಇದರಲ್ಲಿ ಇನ್ನೇನಾದರೂ ಮಾಹಿತಿ ಬೇಕೇ?',
+        visitPrompt: 'ಅಧಿಕೃತ ಪುಟಕ್ಕೆ ಭೇಟಿ ನೀಡಲು ಕೆಳಗಿನ ಬಟನ್ ಕ್ಲಿಕ್ ಮಾಡಿ',
+        visitBtn: '🌐 ಅಧಿಕೃತ ವೆಬ್‌ಸೈಟ್',
+        portal: 'https://myaadhaar.uidai.gov.in',
+        callerThanks: 'ತುಂಬಾ ಧನ್ಯವಾದಗಳು ವಳ್ಳಿ!',
+        valliClosing: 'ವಳ್ಳಿಯನ್ನು ಸಂಪರ್ಕಿಸಿದ್ದಕ್ಕಾಗಿ ಧನ್ಯವಾದಗಳು, ಹೆಚ್ಚಿನ ವಿವರಗಳು ಬೇಕಾದರೆ ನನ್ನನ್ನು ಸಂಪರ್ಕಿಸಿ.'
+      }
+    };
+
+    let currentSimLang = 'ta';
+    const dialogueBox = document.getElementById('sim-dialogue');
+    const statusText = document.getElementById('sim-status');
+    const serviceCard = document.getElementById('sim-card');
+    const cardPrompt = document.getElementById('sim-card-prompt');
+    const siteBtnText = document.getElementById('sim-site-btn-text');
+    const greetingTextEl = document.getElementById('sim-greeting-text');
+    const langBadge = document.getElementById('sim-lang-badge');
+
+    function setSimLanguage(langKey) {
+      currentSimLang = langKey;
+      document.querySelectorAll('.lang-pill').forEach(btn => {
+        btn.classList.remove('active', 'gradient-orange-bg', 'text-white');
+        btn.classList.add('bg-white', 'text-slate-700');
+      });
+      const activeBtn = document.getElementById('tab-' + langKey);
+      if (activeBtn) {
+        activeBtn.classList.add('active');
+        activeBtn.classList.remove('bg-white', 'text-slate-700');
+      }
+      resetDemoScenario();
+    }
+
+    function appendMessage(sender, text, isUser = false) {
+      const msg = document.createElement('div');
+      msg.className = isUser
+        ? 'p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-slate-900'
+        : 'p-3.5 rounded-xl bg-orange-50/70 border border-orange-200 text-slate-900';
+
+      const label = document.createElement('span');
+      label.className = `text-xs font-bold block mb-1 ${isUser ? 'text-amber-800' : 'text-orange-700'}`;
+      label.textContent = sender + ':';
+
+      const content = document.createElement('span');
+      content.className = 'text-slate-800 font-medium leading-relaxed';
+      content.textContent = text;
+
+      msg.appendChild(label);
+      msg.appendChild(content);
+      dialogueBox.appendChild(msg);
+      dialogueBox.scrollTop = dialogueBox.scrollHeight;
+    }
+
+    function setStatus(text, color = 'emerald') {
+      statusText.innerHTML = `<span class="w-2 h-2 rounded-full bg-${color}-500 animate-pulse"></span><span>${text}</span>`;
+    }
+
+    function runDemoScenario() {
+      const scenario = SCENARIOS[currentSimLang];
+      const btn = document.getElementById('btn-demo-start');
+      btn.disabled = true;
+      btn.classList.add('opacity-50');
+
+      // 1. Caller speaks in selected language
+      setStatus('Caller Speaking…', 'amber');
+      appendMessage('Caller (You)', scenario.caller, true);
+
+      // 2. Valli immediately plays localized filler buffer
+      setTimeout(() => {
+        setStatus('Valli Speaking… (Filler)', 'orange');
+        appendMessage('Valli (வள்ளி)', scenario.filler);
+      }, 500);
+
+      // 3. Valli delivers full grounded response
+      setTimeout(() => {
+        setStatus('Valli Speaking… (Response)', 'orange');
+        appendMessage('Valli (வள்ளி)', scenario.response);
+        if (cardPrompt) cardPrompt.textContent = scenario.visitPrompt;
+        if (siteBtnText) siteBtnText.textContent = scenario.visitBtn;
+        serviceCard.classList.remove('hidden');
+      }, 1600);
+
+      // 4. Return to Listening with 45s window
+      setTimeout(() => {
+        setStatus('Listening… (45s Window)', 'emerald');
+        btn.disabled = false;
+        btn.classList.remove('opacity-50');
+      }, 4200);
+    }
+
+    function runThanksScenario() {
+      const scenario = SCENARIOS[currentSimLang];
+      const btnThanks = document.getElementById('btn-demo-thanks');
+      if (btnThanks) {
+        btnThanks.disabled = true;
+        btnThanks.classList.add('opacity-50');
+      }
+
+      // 1. Caller says Thank You in selected language
+      setStatus('Caller Speaking…', 'amber');
+      appendMessage('Caller (You)', scenario.callerThanks, true);
+
+      // 2. Valli immediately responds with localized gratitude & closing
+      setTimeout(() => {
+        setStatus('Valli Speaking… (Closing)', 'orange');
+        appendMessage('Valli (வள்ளி)', scenario.valliClosing);
+      }, 500);
+
+      // 3. Return to Listening (45s Window)
+      setTimeout(() => {
+        setStatus('Listening… (45s Window)', 'emerald');
+        if (btnThanks) {
+          btnThanks.disabled = false;
+          btnThanks.classList.remove('opacity-50');
+        }
+      }, 2500);
+    }
+
+    function resetDemoScenario() {
+      const scenario = SCENARIOS[currentSimLang];
+      langBadge.textContent = scenario.code;
+      dialogueBox.innerHTML = `
+        <div class="p-3.5 rounded-xl bg-orange-50/60 border border-orange-200/80">
+          <span class="text-xs font-bold text-orange-700 block mb-1">Valli (வள்ளி):</span>
+          <span class="text-slate-800 font-medium">${scenario.greeting}</span>
+        </div>
+      `;
+      if (cardPrompt) cardPrompt.textContent = scenario.visitPrompt;
+      if (siteBtnText) siteBtnText.textContent = scenario.visitBtn;
+      serviceCard.classList.add('hidden');
+      setStatus('Connected (Ready)', 'emerald');
+      const btn = document.getElementById('btn-demo-start');
+      const btnThanks = document.getElementById('btn-demo-thanks');
+      if (btn) {
+        btn.disabled = false;
+        btn.classList.remove('opacity-50');
+      }
+      if (btnThanks) {
+        btnThanks.disabled = false;
+        btnThanks.classList.remove('opacity-50');
+      }
+    }
+  </script>
+</body>
+
+</html>

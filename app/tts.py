@@ -36,6 +36,31 @@ from app.tags import Segment
 
 log = logging.getLogger(__name__)
 
+# Compatibility patch for gnani-vachana across websockets versions (<13, 13, 14+)
+try:
+    import inspect
+    import websockets
+    import gnani.tts.client
+
+    def _robust_ws_header_kwargs(headers: dict[str, str]) -> dict[str, Any]:
+        try:
+            sig = inspect.signature(websockets.connect)
+            if "additional_headers" in sig.parameters:
+                return {"additional_headers": headers}
+            if "extra_headers" in sig.parameters:
+                return {"extra_headers": headers}
+        except Exception:
+            pass
+        try:
+            major = int(websockets.__version__.split(".", 1)[0])
+            return {"additional_headers": headers} if major >= 14 else {"extra_headers": headers}
+        except Exception:
+            return {"additional_headers": headers}
+
+    gnani.tts.client._ws_header_kwargs = _robust_ws_header_kwargs
+except Exception:
+    pass
+
 
 # ── Silent WAV factory (for mock mode) ───────────────────────────────────────
 
@@ -106,7 +131,7 @@ def _combine_wavs(wav_list: list[bytes]) -> bytes:
 # ── Real TTS (SDK Realtime WebSocket preferred, fallback to REST/SSE) ────────
 
 
-async def _realtime_ws_synthesize(segment: Segment) -> bytes:
+async def _realtime_ws_synthesize(segment: Segment, language: str = "ta-IN") -> bytes:
     """Use GnaniTTSRealtimeClient for lowest latency audio generation."""
     from gnani.tts import AudioConfig, GnaniTTSRealtimeClient
 
@@ -124,12 +149,14 @@ async def _realtime_ws_synthesize(segment: Segment) -> bytes:
             tts_text,
             voice=TTS_VOICE,
             model=TTS_MODEL,
-            language="ta-IN",
+            language=language,
             audio_config=cfg,
         )
 
 
-async def _rest_synthesize(segment: Segment, *, client: httpx.AsyncClient) -> bytes:
+async def _rest_synthesize(
+    segment: Segment, *, client: httpx.AsyncClient, language: str = "ta-IN"
+) -> bytes:
     """Fallback REST/SSE endpoint."""
     tts_text = _build_tts_text(segment)
 
@@ -137,7 +164,7 @@ async def _rest_synthesize(segment: Segment, *, client: httpx.AsyncClient) -> by
         "text": tts_text,
         "model": TTS_MODEL,
         "voice": TTS_VOICE,
-        "language": "ta-IN",
+        "language": language,
         "speed": 1,
         "audio_config": {
             "sample_rate": TTS_SAMPLE_RATE,
@@ -173,16 +200,16 @@ def _get_http_client() -> httpx.AsyncClient:
     return _http_client
 
 
-async def _synthesize_single(segment: Segment) -> bytes:
+async def _synthesize_single(segment: Segment, language: str = "ta-IN") -> bytes:
     """Synthesize a single verified <= 800 char segment with retry and fallback."""
     for attempt in range(2):
         try:
             try:
-                return await _realtime_ws_synthesize(segment)
+                return await _realtime_ws_synthesize(segment, language=language)
             except Exception as ws_err:
                 log.debug("Realtime WS TTS fallback to REST: %s", ws_err)
                 client = _get_http_client()
-                return await _rest_synthesize(segment, client=client)
+                return await _rest_synthesize(segment, client=client, language=language)
         except Exception as exc:
             if attempt == 0:
                 log.warning("Timbre transient error (retrying): %s", exc)
@@ -192,7 +219,7 @@ async def _synthesize_single(segment: Segment) -> bytes:
     raise GnaniError("Timbre: unreachable")
 
 
-async def synthesize(segment: Segment) -> bytes:
+async def synthesize(segment: Segment, language: str = "ta-IN") -> bytes:
     """
     Synthesize *segment* and return audio bytes (WAV).
     Enforces Gnani Timbre's <= 800 character limit per request.
@@ -213,11 +240,11 @@ async def synthesize(segment: Segment) -> bytes:
                 "tag": segment.get("tag") if i == 0 else None,
                 "text": sub_text,
             }
-            wav_chunk = await _synthesize_single(sub_seg)
+            wav_chunk = await _synthesize_single(sub_seg, language=language)
             wav_chunks.append(wav_chunk)
         return _combine_wavs(wav_chunks)
 
-    return await _synthesize_single(segment)
+    return await _synthesize_single(segment, language=language)
 
 
 async def close() -> None:

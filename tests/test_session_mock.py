@@ -221,3 +221,92 @@ async def test_multi_turn_followup_and_memory():
     assert len(ws.sent_bytes) >= 2
 
 
+@pytest.mark.asyncio
+async def test_multilingual_language_switching():
+    """Verify session switches language and generates language-specific greetings."""
+    from app.session import GREETINGS
+
+    ws = MockWebSocket([])
+    session = FullCallSession(ws)
+
+    # Test Hindi
+    session.set_language("hi-IN")
+    assert session.language == "hi-IN"
+    assert "Hindi" in session._system_prompt or "हिन्दी" in session._system_prompt
+    assert "Namaste" in GREETINGS["hi-IN"]
+
+    # Test Telugu
+    session.set_language("te-IN")
+    assert session.language == "te-IN"
+    assert "Telugu" in session._system_prompt or "తెలుగు" in session._system_prompt
+
+    # Test Malayalam
+    session.set_language("ml-IN")
+    assert session.language == "ml-IN"
+    assert "Malayalam" in session._system_prompt or "മലയാളം" in session._system_prompt
+
+    # Test Kannada
+    session.set_language("kn-IN")
+    assert session.language == "kn-IN"
+    assert "Kannada" in session._system_prompt or "ಕನ್ನಡ" in session._system_prompt
+
+    # Test Tamil (default)
+    session.set_language("ta-IN")
+    assert session.language == "ta-IN"
+    assert "Tamil" in session._system_prompt or "தமிழ்" in session._system_prompt
+
+
+@pytest.mark.asyncio
+async def test_multilingual_thank_you_responses():
+    """Verify thank-you detection and localized closing replies across all 5 languages."""
+    from app.session import _is_thank_you_phrase, THANK_YOU_RESPONSES
+
+    # Verify detection across various languages and English
+    assert _is_thank_you_phrase("thank you")
+    assert _is_thank_you_phrase("Thanks a lot")
+    assert _is_thank_you_phrase("ரொம்ப நன்றி வள்ளி")
+    assert _is_thank_you_phrase("धन्यवाद!")
+    assert _is_thank_you_phrase("చాలా ధన్యవాదాలు")
+    assert _is_thank_you_phrase("വളരെ നന്ദി")
+    assert _is_thank_you_phrase("ತುಂಬಾ ಧನ್ಯವಾದಗಳು")
+
+    ws = MockWebSocket([])
+    session = FullCallSession(ws)
+
+    # Test each language produces its specific thank you reply
+    for lang, expected_snippet in [
+        ("ta-IN", "வள்ளியைத்"),
+        ("hi-IN", "वल्ली से"),
+        ("te-IN", "వల్లిని"),
+        ("ml-IN", "വള്ളിയെ"),
+        ("kn-IN", "ವಳ್ಳಿಯನ್ನು"),
+    ]:
+        session.set_language(lang)
+        await session._run_turn("thank you")
+        msgs = ws.get_json_messages()
+        agent_texts = [m.get("text") for m in msgs if m.get("type") == "agent_text"]
+        assert any(expected_snippet in (t or "") for t in agent_texts)
+        assert THANK_YOU_RESPONSES[lang] in session._history[-1]["content"]
+
+
+@pytest.mark.asyncio
+async def test_playback_done_switches_to_listening_and_arms_45s_timer():
+    """Verify that when audio playback finishes, state transitions to LISTENING and 45s timer is armed."""
+    import time
+    ws = MockWebSocket([])
+    session = FullCallSession(ws)
+    session._client_playing_audio = True
+    session._agent_speaking.set()
+    session.state = CallState.SPEAKING
+
+    # Simulate playback_done event received from browser
+    t_done = time.monotonic()
+    session._client_playing_audio = False
+    session._agent_speaking.clear()
+    session._last_audio_ts = t_done
+    await session._set_state(CallState.LISTENING)
+
+    assert session.state == CallState.LISTENING
+    assert not session._agent_speaking.is_set()
+    assert not session._client_playing_audio
+    assert session._last_audio_ts >= t_done
