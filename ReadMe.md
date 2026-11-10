@@ -114,6 +114,59 @@ govt-call-agent/
 
 ---
 
+## 🏛️ Knowledge Base (`data/knowledge.json`)
+
+Valli operates strictly on verified Indian government scheme and citizen service data defined in [`data/knowledge.json`](file:///home/han/Documents/govt4u/govt-call-agent/data/knowledge.json). When a citizen asks about a service, Valli retrieves the verified steps and triggers a UI card with the direct official portal link.
+
+### Curated Government Services Matrix
+
+| Service ID | Scheme / Service Name | Regional Name | Target Beneficiaries | Essential Documents | Official Portal |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| `passport` | **Passport Application** | பாஸ்போர்ட் | Any Indian citizen (adults / minors) | Proof of address, DOB proof, Photo ID, photographs | [passportindia.gov.in](https://passportindia.gov.in) |
+| `driving_licence` | **Driving Licence** | டிரைவிங் லைசென்ஸ் | Age 16+ (gearless), 18+ (all vehicles) | Learner's Licence (LL), age & address proof, Form 1A | [parivahan.gov.in](https://parivahan.gov.in) |
+| `aadhaar_update` | **Aadhaar Update** | ஆதார் அப்டேட் | Existing Aadhaar card holders | Valid ID proof, address proof, DOB proof, mobile (OTP) | [uidai.gov.in](https://uidai.gov.in) |
+| `pan_card` | **PAN Card** | பான் கார்டு | Any Indian citizen / business taxpayer | Identity proof, address proof, DOB proof, photograph | [incometax.gov.in](https://incometax.gov.in) |
+| `voter_id` | **Voter ID (EPIC)** | வோட்டர் ஐடி | Citizens aged 18+ as of qualifying date | Age proof, address proof, passport-size photo | [eci.gov.in](https://eci.gov.in) |
+| `ration_card_tn` | **Ration Card (TN Smart Card)** | ரேஷன் கார்டு | Tamil Nadu families (PHH / NPHH / AAY) | Family head & members' Aadhaar, address proof | [tnpds.gov.in](https://tnpds.gov.in) |
+| `tn_pension_scheme` | **TN Social Security Pension** | தமிழ்நாடு பென்ஷன் ஸ்கீம் | Elderly (60+), widows (40+), differently abled | Aadhaar, age proof, bank passbook, disability/death cert | [socialsecurity.tn.gov.in](https://socialsecurity.tn.gov.in) |
+| `pm_kisan` | **PM-KISAN Samman Nidhi** | பிஎம்-கிசான் நிதி | Small & marginal landowning farmer families | Aadhaar, land patta/chitta records, bank passbook | [pmkisan.gov.in](https://pmkisan.gov.in) |
+| `pmjay_ayushman` | **Ayushman Bharat (PM-JAY)** | ஆயுஷ்மான் பாரத் | SECC 2011 / CMCHIS eligible families | Applicant Aadhaar, ration card, active mobile number | [pmjay.gov.in](https://pmjay.gov.in) |
+| `nsp_scholarship` | **National Scholarship Portal** | நேஷனல் ஸ்காலர்ஷிப் | Pre-matric, post-matric & merit students | Student Aadhaar, admission receipt, marksheets, income cert | [scholarships.gov.in](https://scholarships.gov.in) |
+
+### JSON Schema & Example Record
+
+Each entry in `knowledge.json` contains structured eligibility, application steps, and portal links:
+
+```json
+{
+  "id": "aadhaar_update",
+  "name_en": "Aadhaar Update",
+  "name_ta": "ஆதார் அப்டேட்",
+  "what_it_is": "Service to update personal details (name, address, date of birth, mobile number, photo) in the Aadhaar database maintained by UIDAI.",
+  "who_can_apply": "Any Aadhaar card holder who needs to correct or update their details.",
+  "documents": [
+    "Valid identity proof (for name change): PAN card, voter ID, passport",
+    "Valid address proof (for address update): utility bill, bank passbook, rental agreement",
+    "Date of birth proof (for DOB update): birth certificate, school certificate",
+    "Mobile number required for OTP during online updates"
+  ],
+  "where_to_apply": "Online at myaadhaar.uidai.gov.in. For biometric updates, visit the nearest Aadhaar Enrolment or Update Centre.",
+  "steps": [
+    "Visit myaadhaar.uidai.gov.in and log in with your Aadhaar number and OTP",
+    "Select 'Update Aadhaar' and choose the field to update",
+    "Upload supporting documents",
+    "Submit the request and note the Update Request Number (URN)",
+    "Track status at myaadhaar.uidai.gov.in using the URN",
+    "Updated Aadhaar will be available for download within 90 days"
+  ],
+  "official_site": "https://uidai.gov.in",
+  "last_checked": "2026-10-01",
+  "verified": false
+}
+```
+
+---
+
 ## 🚀 Getting Started
 
 ### 1. Prerequisites
